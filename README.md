@@ -28,19 +28,21 @@ Dados iniciais:
 
 | ID | Usuário | Perfil | Setor |
 | --- | --- | --- | --- |
-| 1 | Ana Silva | SOLICITANTE | — |
-| 2 | Bruno Lima | SOLICITANTE | — |
-| 3 | Carla Souza | TECNICO | COTIC (1) |
-| 4 | Diego Alves | TECNICO | Manutenção (2) |
+| 1 | João Neto | SOLICITANTE | — |
+| 2 | Lwkas Lwhan | SOLICITANTE | — |
+| 3 | João Manoel | TECNICO | COEX (1) |
+| 4 | Sara Lima | TECNICO | COSGEM (2) |
 
-As categorias 1 e 2 pertencem à COTIC; 3 e 4, à Manutenção.
+As categorias 1 (Estágios) e 2 (Projetos de extensão) pertencem à COEX (Coordenação de Extensão); 3 (Elétrica) e 4 (Mobiliário), à COSGEM (Coordenação de Serviços Gerais e Manutenção).
+
+Os setores são encontrados no portal do IFRN Campus Pau dos Ferros: [COEX](https://portal.ifrn.edu.br/campus/paudosferros/contatos-2/) e [COSGEM](https://portal.ifrn.edu.br/campus/paudosferros/noticias/campus-pau-dos-ferros-suspende-atividades-presenciais-nos-dias-6-e-7-de-janeiro/). Os usuários são cadastros de demonstração, com e-mails e matrículas fictícios. Gustavo Emanuel aparece no exemplo de criação de usuário do arquivo de requisições.
 
 Abrir um chamado:
 
 ```bash
 curl -X POST http://localhost:8080/chamados \
   -H "Content-Type: application/json" \
-  -d '{"titulo":"Wi-Fi sem conexão","descricao":"A rede não conecta no laboratório.","local":"Laboratório 1","solicitanteId":1,"categoriaId":1}'
+  -d '{"titulo":"Dúvida no termo de estágio","descricao":"Preciso de orientação para preencher o termo de compromisso.","local":"Sala da COEX","solicitanteId":1,"categoriaId":1}'
 ```
 
 Assumir o chamado criado, substituindo `1` pelo ID retornado se necessário:
@@ -84,9 +86,9 @@ Para preservar o histórico, uma categoria com chamados não muda de setor, e us
 
 ## Migrations
 
-O Flyway executa os scripts de `src/main/resources/db/migration` em ordem. A V1 cria as tabelas e a V2 insere os dados iniciais. A tabela `flyway_schema_history` registra versão, descrição, execução e checksum de cada migration aplicada.
+O Flyway executa os scripts de `src/main/resources/db/migration` em ordem. A V1 cria as tabelas, a V2 insere os dados iniciais, a V3 atualiza os setores e os nomes dos usuários de demonstração e a V4 ajusta o setor de extensão e suas categorias. A tabela `flyway_schema_history` registra versão, descrição, execução e checksum de cada migration aplicada.
 
-Se uma migration aplicada for alterada, seu checksum muda e a validação do Flyway falha. Por isso, mudanças posteriores devem entrar em uma nova migration, como `V3__adicionar_campo.sql`, preservando as anteriores. O `ddl-auto=validate` apenas confere se as entidades correspondem ao esquema; `update` não é usado porque alterações automáticas não oferecem o mesmo histórico versionado e revisável dos scripts.
+Se uma migration aplicada for alterada, seu checksum muda e a validação do Flyway falha. Por isso, mudanças posteriores devem entrar em uma nova migration, como `V5__adicionar_campo.sql`, preservando as anteriores. O `ddl-auto=validate` apenas confere se as entidades correspondem ao esquema; `update` não é usado porque alterações automáticas não oferecem o mesmo histórico versionado e revisável dos scripts.
 
 Referências: [histórico do Flyway](https://documentation.red-gate.com/flyway/flyway-concepts/migrations/flyway-schema-history-table) e [validação](https://documentation.red-gate.com/fd/validate-277578898.html).
 
