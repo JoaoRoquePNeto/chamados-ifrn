@@ -18,7 +18,7 @@ public class CategoriaService {
     private final ChamadoRepository chamados;
 
     public Page<Categoria> listar(String nome, Long setorId, Pageable pageable) {
-        return categorias.filtrar(nome, setorId, pageable);
+        return categorias.filtrar(nome == null ? "" : nome, setorId, pageable);
     }
 
     public Page<Categoria> listarPorSetor(Long setorId, String nome, Pageable pageable) {

@@ -1,6 +1,7 @@
 package br.edu.ifrn.chamados.exception;
 
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.data.core.PropertyReferenceException;
@@ -15,6 +16,7 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 import java.time.Instant;
 
 @RestControllerAdvice
+@Slf4j
 public class TratadorErros {
     public record Erro(Instant timestamp, int status, String mensagem, String caminho) {}
 
@@ -59,7 +61,8 @@ public class TratadorErros {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Erro> inesperado(HttpServletRequest request) {
+    public ResponseEntity<Erro> inesperado(Exception erro, HttpServletRequest request) {
+        log.error("Falha ao processar {}", request.getRequestURI(), erro);
         return resposta(500, "Não foi possível concluir a operação.", request);
     }
 

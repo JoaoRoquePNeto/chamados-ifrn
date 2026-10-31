@@ -21,7 +21,7 @@ public class UsuarioService {
     private final InteracaoRepository interacoes;
 
     public Page<Usuario> listar(String nome, TipoUsuario tipo, Long setorId, Pageable pageable) {
-        return usuarios.filtrar(nome, tipo, setorId, pageable);
+        return usuarios.filtrar(nome == null ? "" : nome, tipo, setorId, pageable);
     }
 
     public Usuario buscar(Long id) {
