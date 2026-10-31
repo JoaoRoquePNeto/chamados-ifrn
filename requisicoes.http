@@ -1,0 +1,147 @@
+@baseUrl = http://localhost:8080
+
+### Criar setor
+# @name criarSetor
+POST {{baseUrl}}/setores
+Content-Type: application/json
+
+{"nome":"Biblioteca","sigla":"BIB"}
+
+### Listar setores com filtro e paginação
+GET {{baseUrl}}/setores?nome=bib&page=0&size=10&sort=nome,asc
+
+### Buscar setor
+GET {{baseUrl}}/setores/{{criarSetor.response.body.$.id}}
+
+### Atualizar setor
+PUT {{baseUrl}}/setores/{{criarSetor.response.body.$.id}}
+Content-Type: application/json
+
+{"nome":"Biblioteca do Campus","sigla":"BIB"}
+
+### Criar categoria
+# @name criarCategoria
+POST {{baseUrl}}/categorias
+Content-Type: application/json
+
+{"nome":"Empréstimos","descricao":"Suporte aos empréstimos de livros.","setorId":{{criarSetor.response.body.$.id}}}
+
+### Listar categorias
+GET {{baseUrl}}/categorias?nome=rede&setorId=1&page=0&size=10&sort=nome,asc
+
+### Buscar categoria
+GET {{baseUrl}}/categorias/{{criarCategoria.response.body.$.id}}
+
+### Atualizar categoria
+PUT {{baseUrl}}/categorias/{{criarCategoria.response.body.$.id}}
+Content-Type: application/json
+
+{"nome":"Acervo","descricao":"Suporte ao acervo da biblioteca.","setorId":{{criarSetor.response.body.$.id}}}
+
+### Listar categorias de um setor
+GET {{baseUrl}}/setores/1/categorias?nome=rede&page=0&size=10&sort=nome,asc
+
+### Criar usuário
+# @name criarUsuario
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{"nome":"Elisa Santos","email":"elisa@exemplo.com","matricula":"20260005","tipo":"SOLICITANTE"}
+
+### Listar usuários
+GET {{baseUrl}}/usuarios?nome=carla&tipo=TECNICO&setorId=1&page=0&size=10&sort=nome,asc
+
+### Buscar usuário
+GET {{baseUrl}}/usuarios/{{criarUsuario.response.body.$.id}}
+
+### Atualizar usuário
+PUT {{baseUrl}}/usuarios/{{criarUsuario.response.body.$.id}}
+Content-Type: application/json
+
+{"nome":"Elisa Santos Lima","email":"elisa@exemplo.com","matricula":"20260005","tipo":"SOLICITANTE"}
+
+### Abrir chamado
+# @name abrirChamado
+POST {{baseUrl}}/chamados
+Content-Type: application/json
+
+{"titulo":"Wi-Fi sem conexão","descricao":"Os computadores não acessam a rede.","local":"Laboratório 1","prioridade":"ALTA","solicitanteId":1,"categoriaId":1}
+
+### Listar chamados com filtros combinados
+GET {{baseUrl}}/chamados?status=ABERTO&prioridade=ALTA&setorId=1&categoriaId=1&solicitanteId=1&dataInicio=2026-01-01&dataFim=2026-12-31&page=0&size=10&sort=dataAbertura,desc
+
+### Interação do solicitante
+POST {{baseUrl}}/chamados/{{abrirChamado.response.body.$.id}}/interacoes
+Content-Type: application/json
+
+{"autorId":1,"texto":"O problema também afeta o projetor."}
+
+### Assumir chamado
+PATCH {{baseUrl}}/chamados/{{abrirChamado.response.body.$.id}}/assumir
+Content-Type: application/json
+
+{"tecnicoId":3}
+
+### Interação do técnico
+POST {{baseUrl}}/chamados/{{abrirChamado.response.body.$.id}}/interacoes
+Content-Type: application/json
+
+{"autorId":3,"texto":"Estou verificando o roteador do laboratório."}
+
+### Detalhar chamado com histórico
+GET {{baseUrl}}/chamados/{{abrirChamado.response.body.$.id}}
+
+### Listar chamados do solicitante
+GET {{baseUrl}}/usuarios/1/chamados?status=EM_ATENDIMENTO&page=0&size=10&sort=dataAbertura,desc
+
+### Listar chamados do técnico
+GET {{baseUrl}}/usuarios/3/chamados?status=EM_ATENDIMENTO&page=0&size=10
+
+### Filtrar por técnico
+GET {{baseUrl}}/chamados?tecnicoId=3&page=0&size=10
+
+### Resolver chamado
+PATCH {{baseUrl}}/chamados/{{abrirChamado.response.body.$.id}}/resolver
+Content-Type: application/json
+
+{"tecnicoId":3,"solucao":"Roteador reiniciado e conexão testada nos computadores."}
+
+### Abrir outro chamado com prioridade padrão
+# @name chamadoParaCancelar
+POST {{baseUrl}}/chamados
+Content-Type: application/json
+
+{"titulo":"Lâmpada apagada","descricao":"A lâmpada da entrada não acende.","local":"Bloco A","solicitanteId":2,"categoriaId":3}
+
+### Cancelar chamado aberto
+PATCH {{baseUrl}}/chamados/{{chamadoParaCancelar.response.body.$.id}}/cancelar
+Content-Type: application/json
+
+{"solicitanteId":2}
+
+### Excluir categoria sem chamados
+DELETE {{baseUrl}}/categorias/{{criarCategoria.response.body.$.id}}
+
+### Excluir setor sem vínculos
+DELETE {{baseUrl}}/setores/{{criarSetor.response.body.$.id}}
+
+### Email duplicado: 409
+POST {{baseUrl}}/usuarios
+Content-Type: application/json
+
+{"nome":"Outra Ana","email":"ana@exemplo.com","matricula":"20269999","tipo":"SOLICITANTE"}
+
+### Recurso inexistente: 404
+GET {{baseUrl}}/chamados/999999
+
+### Dados inválidos: 400
+POST {{baseUrl}}/setores
+Content-Type: application/json
+
+{"nome":"","sigla":""}
+
+### Chamado encerrado não aceita interação: 409
+POST {{baseUrl}}/chamados/{{abrirChamado.response.body.$.id}}/interacoes
+Content-Type: application/json
+
+{"autorId":1,"texto":"Nova mensagem após o encerramento."}
